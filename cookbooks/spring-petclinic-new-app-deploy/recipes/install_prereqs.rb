@@ -5,7 +5,7 @@
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
 # Install Java
-node.default['java']['jdk_version'] = '7'
+node.default['java']['jdk_version'] = '8'
 include_recipe 'java'
 
 # Install curl
