@@ -20,4 +20,4 @@ include_recipe 'spring-petclinic-new-app-deploy::secure_middleware'
 include_recipe 'spring-petclinic-new-app-deploy::enable_webapp' 
 
 # Customize Web Application
-# include_recipe 'spring-petclinic-new-app-deploy::customize_webapp' 
+include_recipe 'spring-petclinic-new-app-deploy::customize_webapp' 
