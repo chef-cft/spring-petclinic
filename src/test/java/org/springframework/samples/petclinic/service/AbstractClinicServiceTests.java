@@ -18,9 +18,8 @@ package org.springframework.samples.petclinic.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
+import java.util.Date;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Owner;
@@ -62,7 +61,7 @@ public abstract class AbstractClinicServiceTests {
         assertThat(owners.size()).isEqualTo(2);
 
         owners = this.clinicService.findOwnerByLastName("Daviss");
-        assertThat(owners.isEmpty());
+        assertThat(owners.isEmpty()).isTrue();
     }
 
     @Test
@@ -136,7 +135,7 @@ public abstract class AbstractClinicServiceTests {
         pet.setName("bowser");
         Collection<PetType> types = this.clinicService.findPetTypes();
         pet.setType(EntityUtils.getById(types, PetType.class, 2));
-        pet.setBirthDate(new LocalDate());
+        pet.setBirthDate(new Date());
         owner6.addPet(pet);
         assertThat(owner6.getPets().size()).isEqualTo(found + 1);
 
@@ -188,6 +187,16 @@ public abstract class AbstractClinicServiceTests {
         pet7 = this.clinicService.findPetById(7);
         assertThat(pet7.getVisits().size()).isEqualTo(found + 1);
         assertThat(visit.getId()).isNotNull();
+    }
+
+    @Test
+       public void shouldFindVisitsByPetId() throws Exception {
+        Collection<Visit> visits = this.clinicService.findVisitsByPetId(7);
+        assertThat(visits.size()).isEqualTo(2);
+        Visit[] visitArr = visits.toArray(new Visit[visits.size()]);
+        assertThat(visitArr[0].getPet()).isNotNull();
+        assertThat(visitArr[0].getDate()).isNotNull();
+        assertThat(visitArr[0].getPet().getId()).isEqualTo(7);
     }
 
 
