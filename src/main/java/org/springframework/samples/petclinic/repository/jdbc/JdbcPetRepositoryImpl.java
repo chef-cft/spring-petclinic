@@ -32,7 +32,6 @@ import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
-import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.repository.OwnerRepository;
 import org.springframework.samples.petclinic.repository.PetRepository;
 import org.springframework.samples.petclinic.repository.VisitRepository;
@@ -82,26 +81,16 @@ public class JdbcPetRepositoryImpl implements PetRepository {
 
     @Override
     public Pet findById(int id) throws DataAccessException {
-        JdbcPet pet;
+        Integer ownerId;
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("id", id);
-            pet = this.namedParameterJdbcTemplate.queryForObject(
-                "SELECT id, name, birth_date, type_id, owner_id FROM pets WHERE id=:id",
-                params,
-                new JdbcPetRowMapper());
+            ownerId = this.namedParameterJdbcTemplate.queryForObject("SELECT owner_id FROM pets WHERE id=:id", params, Integer.class);
         } catch (EmptyResultDataAccessException ex) {
             throw new ObjectRetrievalFailureException(Pet.class, id);
         }
-        Owner owner = this.ownerRepository.findById(pet.getOwnerId());
-        owner.addPet(pet);
-        pet.setType(EntityUtils.getById(findPetTypes(), PetType.class, pet.getTypeId()));
-
-        List<Visit> visits = this.visitRepository.findByPetId(pet.getId());
-        for (Visit visit : visits) {
-            pet.addVisit(visit);
-        }
-        return pet;
+        Owner owner = this.ownerRepository.findById(ownerId);
+        return EntityUtils.getById(owner.getPets(), Pet.class, id);
     }
 
     @Override
@@ -125,7 +114,7 @@ public class JdbcPetRepositoryImpl implements PetRepository {
         return new MapSqlParameterSource()
             .addValue("id", pet.getId())
             .addValue("name", pet.getName())
-            .addValue("birth_date", pet.getBirthDate().toDate())
+            .addValue("birth_date", pet.getBirthDate())
             .addValue("type_id", pet.getType().getId())
             .addValue("owner_id", pet.getOwner().getId());
     }

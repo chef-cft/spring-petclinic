@@ -54,12 +54,6 @@ public class CallMonitoringAspect {
         this.enabled = enabled;
     }
 
-    /* Suppress Findbugs warning about inconsistent synchronization
-    
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "IS2_INCONSISTENT_SYNC", 
-                                                      justification="Ignoring")
-    */
-   
     @ManagedOperation
     public void reset() {
         this.callCount = 0;
@@ -90,10 +84,10 @@ public class CallMonitoringAspect {
                 return joinPoint.proceed();
             } finally {
                 sw.stop();
-                /*synchronized (this) {*/
+                synchronized (this) {
                     this.callCount++;
                     this.accumulatedCallTime += sw.getTotalTimeMillis();
-               /* } */
+                }
             }
         } else {
             return joinPoint.proceed();
